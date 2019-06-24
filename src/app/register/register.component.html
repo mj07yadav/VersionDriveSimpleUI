@@ -21,6 +21,14 @@
                 right: 300px;"><i class="material-icon">Register</i></button>
         </form>
     </div>
+    <a routerLink="/">Go To Login Page</a>
     <p *ngIf="registerflag">
         <ngb-alert type="success" (close)="close()" >Successfully Registered!</ngb-alert>
-      </p>
+      </p> 
+      <p *ngIf="errormessageFlagusername">
+          <ngb-alert type="danger" (close)="close()" >Username is already present please try using alphanumeric!</ngb-alert>
+        </p>
+      
+        <p *ngIf="errormessageFlaguseremail">
+            <ngb-alert type="danger" (close)="close()" >This email is already in use !</ngb-alert>
+          </p>

@@ -1,7 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FileListService, FileObjectForTransfere } from '../file-list.service';
 import { DomSanitizer} from '@angular/platform-browser';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import { FormBuilder } from '@angular/forms';
+import { Router } from '@angular/router';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {debounceTime, distinctUntilChanged, map} from 'rxjs/operators';
+import { UserdetailsFetchService} from '../userdetails-fetch.service';
+
+
+interface Alert {
+  type: string;
+  message: string;
+}
+
+export class ShareRequestObject{
+  constructor(private toemail,private fromuserid,private permission,private fileid){}
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -9,16 +25,20 @@ import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
-
+  
+  closeResult: string;
   userid=sessionStorage.getItem("userid");
   fileListobject:FileObjectForTransfere[];
   viewfileurls=[];
   downloadfileurls=[];
+  fileids=[];
   viewflag=[];
   fileType:String[]=[];
   private bodyText: string;
+  formModelobject;
+  useremails;
 
-  constructor(private filelistservice:FileListService,sanitizer: DomSanitizer,private modalService: NgbModal) {
+  constructor(private filelistservice:FileListService,sanitizer: DomSanitizer,private modalService: NgbModal,private form:FormBuilder,private router:Router,private http:HttpClient,private userservice:UserdetailsFetchService) {
 
       this.filelistservice.getListOfFiles().subscribe(data=>{
           this.fileListobject=data;
@@ -29,6 +49,7 @@ export class DashboardComponent implements OnInit {
               this.downloadfileurls.push("http://localhost:8080/viewdownload/download/"+this.userid+"/"+this.fileListobject[i].fileid);
               this.viewflag.push(false);
               let name:String=this.fileListobject[i].filename;
+              this.fileids.push(this.fileListobject[i].fileid);
               let type=name.substring((name.length-3),name.length);
               if(type === 'png' || type==='jpg'){
                   this.fileType.push('image');
@@ -46,12 +67,17 @@ export class DashboardComponent implements OnInit {
               //console.log((name.length-(name.length-3))+"  "+name+" "+name.length+"  "+type+" t "+this.fileType);
           }
       });
-    // this.fileListobject=this.filelistservice.listOfFiles[0];
-    //  console.log(this.fileListobject.fileid);
+
+      this.formModelobject=this.form.group({
+        useremail:'',
+        permission:''
+      });
    }
 
    ngOnInit() {
-    
+    this.userservice.getListOfUsers().subscribe(data=>{
+      this.useremails=data;
+    });
 }
     view(index){
         this.viewflag[index]=!this.viewflag[index];
@@ -60,7 +86,9 @@ export class DashboardComponent implements OnInit {
     download(index){
       window.open(this.downloadfileurls[index]);
     }
-    closeResult: string;
+
+
+
     open(content) {
       this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
         this.closeResult = `Closed with: ${result}`;
@@ -68,16 +96,57 @@ export class DashboardComponent implements OnInit {
         this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
       });
     }
-  
+    
     private getDismissReason(reason: any): string {
       if (reason === ModalDismissReasons.ESC) {
         return 'by pressing ESC';
       } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
         return 'by clicking on a backdrop';
       } else {
+        console.log(`with: ${reason}`);
         return  `with: ${reason}`;
       }
     }
+   
+    submitFormForShare(shareformdata,index){
+      console.log(shareformdata.permission+" s "+shareformdata.useremail+" s "+index);
+      this.shareformsubmissionflag=true;
+      const header = new HttpHeaders().set("Authorization",`Bearer ${sessionStorage.getItem("token")}`);
+         return this.http.post('http://localhost:8080/viewdownload/share/'+this.fileids[index],new ShareRequestObject(shareformdata.useremail,sessionStorage.getItem("userid"),shareformdata.permission,this.fileids[index]) ,{headers:header})
+         .subscribe(data =>{
+              
+         },
+         error =>{
+          this.shareformsubmissionflagerro=true;
+         });
+    }
+
+    uploadVersion(index){
+
+    }
+  
+    shareformsubmissionflag=false;
+    shareformsubmissionflagerro=false;
+    close(alert: Alert) {
+      this.shareformsubmissionflag=false;
+      this.shareformsubmissionflagerro=false;
+    }
+
+  public model: any;
+  public emailfromformdata:any;
 
 
-}
+  formatter = (result: string) => result.toUpperCase();
+
+  search = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => term === '' ? []
+        : this.useremails.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+    )
+
+      // Share files service call
+      
+  }
+

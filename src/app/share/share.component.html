@@ -1,0 +1,104 @@
+<style>
+    .demo-card-square.mdl-card {
+      width: 320px;
+      height: 320px;
+    }
+    .demo-card-square > .mdl-card__title {
+      color: #fff;
+      background:
+        url('../assets/demos/dog.png') bottom right 15% no-repeat #46B6AC;
+    }
+    </style>
+<h2>List Of Shared Files</h2>  
+    <div class="mdl-list__item" *ngFor="let fileobject of fileListobject ; index as i ">
+
+      <!-- creating Cards -->
+      <div class="demo-card-square mdl-card mdl-shadow--2dp" >
+          <div class="mdl-card__title mdl-card--expand">
+            <h4 class="mdl-card__title-text">{{fileobject.filename}}</h4>
+          </div>
+          <div class="mdl-card__supporting-text">
+              <h6 class="mdl-card__title-text">{{fileobject.creationDate}}</h6>
+          </div>
+          <div class="mdl-card__actions mdl-card--border">
+              <div class="row">
+                  <div class="col">
+                    <div ngbDropdown class="d-inline-block">
+                      <button class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle>Actions</button>
+                      <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                        <button class="btn btn-primary" (click)="download(i)" ngbDropdownItem>Download</button>     
+                        <button class="btn btn-primary" (click)="open(content)" ngbDropdownItem>Preview</button> 
+                        <button class="btn btn-primary" (click)="open(content)" ngbDropdownItem>Share</button>  
+                        <button class="btn btn-primary" (click)="uploadVersion(i)" ngbDropdownItem>Upload latest Version</button> 
+                      </div>
+                    </div>
+                  </div>
+          </div>
+        </div>
+
+
+        <ng-template #content let-modal>
+            <div class="modal-body" *ngIf='fileType[i] === "image"' style="width: 250%;
+            right: 400px;
+            padding: 0px;">
+                <img [src]="viewfileurls[i]"  *ngIf='fileType[i] === "image"' style="    width: 100%;" />
+            </div>
+  
+            <div class="modal-body" *ngIf='fileType[i] === "PDF"' style="    width: 200%;
+            right: 200px;
+            padding: 0px;
+            height: 100px;">
+                <iframe [src]="viewfileurls[i]"   width="800px" height="800px" *ngIf='fileType[i] === "PDF"' style="    width: 100%;
+                "></iframe>
+                <!-- <embed [src]="viewfileurls[i]" width="800px" height="1100px"  *ngIf='viewflag[i] && fileType[i] === "PDF"'/> -->
+             </div>   
+          
+                <!-- Can be done using iframe -->
+                <div class="modal-body" *ngIf='fileType[i] === "video"' style=" padding:0px;   width: 400%;
+                right: 500px;
+                height: 500px; ">
+                <video  *ngIf='fileType[i] === "video"' style=" width: 75%;
+                padding: 0px;" controls>
+                  <source [src]="viewfileurls[i]" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+                </div>
+                <div class="modal-body" *ngIf='fileType[i] === "audio"'>
+                <audio *ngIf='fileType[i] === "audio"' style="    width: 100%;" controls>
+                  <source [src]="viewfileurls[i]" type="audio/mpeg" >
+                Your browser does not support the audio element.
+                </audio>
+                </div>
+          </ng-template>
+          
+          <hr>
+          
+          <!-- <pre>{{closeResult}}</pre> -->
+          <!-- Modal For choosing usertoshare  -->
+          <ng-template #content let-modal >
+              <div class="modal-body" >
+                  <form [formGroup]="formModelobject" (ngSubmit)="submitFormForShare(formModelobject.value,i)">
+                      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="top:50px;">
+                          <label for="typeahead-format">User Email</label>
+                          <input id="typeahead-format" type="text" class="form-control" formControlName="useremail"   [ngbTypeahead]="search" [resultFormatter]="formatter" />
+                      </div>
+                      <br />
+                      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="top:80px;">
+                              <input class="mdl-textfield__input" type="text" id="sample1" formControlName="permission" >
+                              <label class="mdl-textfield__label" for="sample1">Permissions</label>
+                            </div>
+                            
+                      <button  class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" style="    top: 130px;
+                      right: 300px;" ><i class="material-icon">share</i></button>
+              </form>
+              </div>
+              <p *ngIf="shareformsubmissionflag">
+                  <ngb-alert type="success" (close)="close()" >Successfully shared File Please close Popup!</ngb-alert>
+                </p>
+                <p *ngIf="shareformsubmissionflagerro">
+                    <ngb-alert type="danger" (close)="close()" >Cant be Shared Right Now !</ngb-alert>
+                  </p>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-outline-dark" (click)="modal.close('close')">Close</button>
+                </div>
+            </ng-template>

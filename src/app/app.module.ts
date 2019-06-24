@@ -12,13 +12,15 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {NgbPaginationModule, NgbAlertModule} from '@ng-bootstrap/ng-bootstrap';
 import { RegisterComponent, RegisterRequest } from './register/register.component';
+import { ShareComponent } from './share/share.component';
 //import { SafePipe } from './sagePipe';
 
 const approutes : Routes = [
   {path:'' , component:LoginComponent},
   {path:'upload' , component:FormUploadComponent},
   {path:'dashboard',component:DashboardComponent},
-  {path:'register',component:RegisterComponent}
+  {path:'register',component:RegisterComponent},
+  {path:'share' , component:ShareComponent}
 ]
 
 
@@ -29,6 +31,7 @@ const approutes : Routes = [
     FormUploadComponent,
     DashboardComponent,
     RegisterComponent,
+    ShareComponent,
   ],
   imports: [
     BrowserModule,

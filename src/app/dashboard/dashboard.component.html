@@ -1,26 +1,61 @@
+<style>
+    .demo-card-square.mdl-card {
+      width: 320px;
+      height: 320px;
+    }
+    .demo-card-square > .mdl-card__title {
+      color: #fff;
+      background:
+        url('../assets/demos/dog.png') bottom right 15% no-repeat #46B6AC;
+    }
+    </style>
+
+<div class="container">
 <p>
-  dashboard works!   
-  <a href="/upload">Upload Files</a>
+  Upload Files !  
+  <button class="btn btn-primary" ><a [routerLink]="['/upload']">Upload Files</a></button>
 </p>
+
+<div class="container">
+    <p>
+      Upload Files !  
+      <a class="btn btn-primary" [routerLink]="['/share']">Shared Files</a>
+    </p>
 
 
   <h2>List Of Files in Your Directory</h2>  
     <div class="mdl-list__item" *ngFor="let fileobject of fileListobject ; index as i ">
-      <p>FileName -->  {{fileobject.filename}} </p>
-      <p>Created At  --> {{fileobject.creationDate}}  </p>
-      <!-- <button class="btn btn-primary" data-target="#loginModal" data-toggle="modal" (click)="view(i)" >Preview</button> -->
-      <button class="btn btn-primary" (click)="download(i)">Download</button>
+
+      <!-- creating Cards -->
+      <div class="demo-card-square mdl-card mdl-shadow--2dp" >
+          <div class="mdl-card__title mdl-card--expand">
+            <h4 class="mdl-card__title-text">{{fileobject.filename}}</h4>
+          </div>
+          <div class="mdl-card__supporting-text">
+              <h6 class="mdl-card__title-text">{{fileobject.creationDate}}</h6>
+          </div>
+          <div class="mdl-card__actions mdl-card--border">
+              <div class="row">
+                  <div class="col">
+                    <div ngbDropdown class="d-inline-block">
+                      <button class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle>Actions</button>
+                      <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                        <button class="btn btn-primary" (click)="download(i)" ngbDropdownItem>Download</button>     
+                        <button class="btn btn-primary" (click)="open(content)" ngbDropdownItem>Preview</button> 
+                        <button class="btn btn-primary" (click)="open(content)" ngbDropdownItem>Share</button>  
+                        <button class="btn btn-primary" (click)="uploadVersion(i)" ngbDropdownItem>Upload latest Version</button> 
+                      </div>
+                    </div>
+                  </div>
+          </div>
+        </div>
+      <!-- End section for cards -->
+     
       <ng-template #content let-modal>
-          <!-- <div class="modal-header">
-            <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-              <span aria-hidden="true">&times;</span>
-            </button> 
-          </div> -->
           <div class="modal-body" *ngIf='fileType[i] === "image"' style="width: 250%;
           right: 400px;
           padding: 0px;">
-              <img [src]="viewfileurls[i]"  *ngIf='fileType[i] === "image"' style="    width: 100%;
-              " />
+              <img [src]="viewfileurls[i]"  *ngIf='fileType[i] === "image"' style="    width: 100%;" />
           </div>
 
           <div class="modal-body" *ngIf='fileType[i] === "PDF"' style="    width: 200%;
@@ -50,15 +85,40 @@
               </div>
         </ng-template>
         
-        <button class="btn btn-primary" (click)="open(content)">Preview</button>
-        
         <hr>
         
         <!-- <pre>{{closeResult}}</pre> -->
+        <!-- Modal For choosing usertoshare  -->
+        <ng-template #content let-modal >
+            <div class="modal-body" >
+                <form [formGroup]="formModelobject" (ngSubmit)="submitFormForShare(formModelobject.value,i)">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="top:50px;">
+                        <label for="typeahead-format">User Email</label>
+                        <input id="typeahead-format" type="text" class="form-control" formControlName="useremail"   [ngbTypeahead]="search" [resultFormatter]="formatter" />
+                    </div>
+                    <br />
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="top:80px;">
+                            <input class="mdl-textfield__input" type="text" id="sample1" formControlName="permission" >
+                            <label class="mdl-textfield__label" for="sample1">Permissions</label>
+                          </div>
+                          
+                    <button  class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" style="    top: 130px;
+                    right: 300px;" ><i class="material-icon">share</i></button>
+            </form>
+            </div>
+            <p *ngIf="shareformsubmissionflag">
+                <ngb-alert type="success" (close)="close()" >Successfully shared File Please close Popup!</ngb-alert>
+              </p>
+              <p *ngIf="shareformsubmissionflagerro">
+                  <ngb-alert type="danger" (close)="close()" >Cant be Shared Right Now !</ngb-alert>
+                </p>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark" (click)="modal.close('close')">Close</button>
+              </div>
+          </ng-template>
 
-      
+
+
     </div>
 
-
-
-    
+  </div>

@@ -22,6 +22,8 @@ export class RegisterRequest{
 })
 export class RegisterComponent implements OnInit {
   registerflag=false;
+  errormessageFlagusername=false;
+  errormessageFlaguseremail=false;
   ngOnInit(): void {
 
   }
@@ -42,8 +44,13 @@ export class RegisterComponent implements OnInit {
       obs.subscribe(data => {
           this.registerresponse=data;
           if(this.registerresponse.status.length>0){
-            if(this.registerresponse.status=== 'SUCCESS')
+            if(this.registerresponse.status=== 'SUCCESS'){
             this.registerflag=true;
+            }else if(this.registerresponse.status === 'Username'){
+              this.errormessageFlagusername=true;
+            }else if(this.registerresponse.status === 'Useremail'){
+              this.errormessageFlaguseremail=true;
+            }
           }
       },
       error => {
@@ -54,5 +61,7 @@ export class RegisterComponent implements OnInit {
 
   close(alert: Alert) {
       this.registerflag=false;
+      this.errormessageFlaguseremail=false;
+      this.errormessageFlagusername=false;
   }
 }
