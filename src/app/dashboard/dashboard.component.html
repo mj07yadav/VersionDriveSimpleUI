@@ -1,0 +1,64 @@
+<p>
+  dashboard works!   
+  <a href="/upload">Upload Files</a>
+</p>
+
+
+  <h2>List Of Files in Your Directory</h2>  
+    <div class="mdl-list__item" *ngFor="let fileobject of fileListobject ; index as i ">
+      <p>FileName -->  {{fileobject.filename}} </p>
+      <p>Created At  --> {{fileobject.creationDate}}  </p>
+      <!-- <button class="btn btn-primary" data-target="#loginModal" data-toggle="modal" (click)="view(i)" >Preview</button> -->
+      <button class="btn btn-primary" (click)="download(i)">Download</button>
+      <ng-template #content let-modal>
+          <!-- <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+              <span aria-hidden="true">&times;</span>
+            </button> 
+          </div> -->
+          <div class="modal-body" *ngIf='fileType[i] === "image"' style="width: 250%;
+          right: 400px;
+          padding: 0px;">
+              <img [src]="viewfileurls[i]"  *ngIf='fileType[i] === "image"' style="    width: 100%;
+              " />
+          </div>
+
+          <div class="modal-body" *ngIf='fileType[i] === "PDF"' style="    width: 200%;
+          right: 200px;
+          padding: 0px;
+          height: 100px;">
+              <iframe [src]="viewfileurls[i]"   width="800px" height="800px" *ngIf='fileType[i] === "PDF"' style="    width: 100%;
+              "></iframe>
+              <!-- <embed [src]="viewfileurls[i]" width="800px" height="1100px"  *ngIf='viewflag[i] && fileType[i] === "PDF"'/> -->
+           </div>   
+        
+              <!-- Can be done using iframe -->
+              <div class="modal-body" *ngIf='fileType[i] === "video"' style=" padding:0px;   width: 400%;
+              right: 500px;
+              height: 500px; ">
+              <video  *ngIf='fileType[i] === "video"' style=" width: 75%;
+              padding: 0px;" controls>
+                <source [src]="viewfileurls[i]" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+              </div>
+              <div class="modal-body" *ngIf='fileType[i] === "audio"'>
+              <audio *ngIf='fileType[i] === "audio"' style="    width: 100%;" controls>
+                <source [src]="viewfileurls[i]" type="audio/mpeg" >
+              Your browser does not support the audio element.
+              </audio>
+              </div>
+        </ng-template>
+        
+        <button class="btn btn-primary" (click)="open(content)">Preview</button>
+        
+        <hr>
+        
+        <!-- <pre>{{closeResult}}</pre> -->
+
+      
+    </div>
+
+
+
+    
